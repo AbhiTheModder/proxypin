@@ -20,8 +20,9 @@ dependencies:
   window_manager: ^0.5.1
   desktop_multi_window:
     git:
-      url: https://gitee.com/wanghongenpin/flutter-plugins.git
+      url: https://github.com/MixinNetwork/flutter-plugins.git
       path: packages/desktop_multi_window
+      ref: dff8405d876c7c64a0a858eb8a86e433a00080ae
   path_provider: ^2.1.5
   file_picker: ^10.3.10
   proxy_manager: ^0.0.3
