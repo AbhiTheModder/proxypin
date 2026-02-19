@@ -1,4 +1,7 @@
 {
+  "breakpoint": "Breakpoint",
+  "breakpointRule": "Breakpoint Rule",
+  "name": "Name",
   "requests": "Requests",
   "favorites": "Favorites",
   "history": "History",
@@ -15,7 +18,8 @@
   "username": "Username",
   "password": "Password",
   "proxySetting": "Proxy Setting",
-  "systemProxy": "Set as System Proxy",
+  "setAs": "Set as ",
+  "systemProxy": "System Proxy",
   "enabledHTTP2": "Enable HTTP2",
   "serverNotStart": "Proxy server not started",
   "download": "Download",
@@ -175,7 +179,6 @@
   "deleteFavorite": "Delete Favorite",
   "emptyFavorite": "Empty Favorite",
   "deleteFavoriteSuccess": "Favorite deleted",
-  "name": "Name",
 
   "historyRecord": "History",
   "historyCacheTime": "Cache Time",

@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:proxypin/l10n/app_localizations.dart';
 import 'package:proxypin/network/bin/server.dart';
 import 'package:proxypin/network/components/manager/hosts_manager.dart';
 import 'package:proxypin/network/components/manager/request_block_manager.dart';
 import 'package:proxypin/network/components/manager/request_rewrite_manager.dart';
+import 'package:proxypin/network/util/system_proxy.dart';
 import 'package:proxypin/storage/histories.dart';
 import 'package:proxypin/ui/component/proxy_port_setting.dart';
 import 'package:proxypin/ui/configuration.dart';
@@ -180,6 +183,8 @@ class SettingPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final configuration = proxyServer.configuration;
 
+    var textEditingController = TextEditingController(text: configuration.proxyPassDomains);
+
     AppLocalizations localizations = AppLocalizations.of(context)!;
     bool isEn = appConfiguration.language?.languageCode == 'en';
 
@@ -225,6 +230,18 @@ class SettingPage extends StatelessWidget {
                     title: '${localizations.proxy}${isEn ? ' ' : ''}${localizations.port}',
                     textStyle: const TextStyle(fontSize: 16)),
                 Divider(height: 0, thickness: 0.3, color: Theme.of(context).dividerColor.withValues(alpha: 0.22)),
+                if (Platform.isAndroid)
+                  ListTile(
+                      title: Text(localizations.systemProxy),
+                      trailing: SwitchWidget(
+                          value: configuration.enableSystemProxy,
+                          scale: 0.8,
+                          onChanged: (value) {
+                            configuration.enableSystemProxy = value;
+                            proxyServer.configuration.flushConfig();
+                          })),
+                if (Platform.isAndroid)
+                  Divider(height: 0, thickness: 0.3, color: Theme.of(context).dividerColor.withValues(alpha: 0.22)),
                 ListTile(
                     title: const Text("SOCKS5"),
                     trailing: SwitchWidget(
@@ -253,6 +270,47 @@ class SettingPage extends StatelessWidget {
                           context: context,
                           builder: (_) => ExternalProxyDialog(configuration: proxyServer.configuration));
                     }),
+                Divider(height: 0, thickness: 0.3, color: Theme.of(context).dividerColor.withValues(alpha: 0.22)),
+
+                Padding(
+                    padding: const EdgeInsets.only(left: 15),
+                    child: Row(children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(localizations.proxyIgnoreDomain, style: const TextStyle(fontSize: 14)),
+                          const SizedBox(height: 3),
+                          Text(isEn ? "Use ';' to separate multiple entries" : "多个使用;分割",
+                              style: TextStyle(fontSize: 11, color: Colors.grey.shade600)),
+                        ],
+                      ),
+                      Padding(
+                          padding: const EdgeInsets.only(left: 35),
+                          child: TextButton(
+                            child: Text(localizations.reset),
+                            onPressed: () {
+                              textEditingController.text = SystemProxy.proxyPassDomains;
+                            },
+                          ))
+                    ])),
+                const SizedBox(height: 5),
+                Padding(
+                    padding: const EdgeInsets.only(left: 15, right: 5),
+                    child: TextField(
+                        textInputAction: TextInputAction.done,
+                        style: const TextStyle(fontSize: 13),
+                        controller: textEditingController,
+                        onSubmitted: (_) {
+                          configuration.proxyPassDomains = textEditingController.text;
+                          proxyServer.configuration.flushConfig();
+                        },
+                        decoration: const InputDecoration(
+                          contentPadding: EdgeInsets.all(10),
+                          border: OutlineInputBorder(),
+                        ),
+                        maxLines: 5,
+                        minLines: 1)),
+                // const SizedBox(height: 10),
               ])),
           const SizedBox(height: 12),
           section([

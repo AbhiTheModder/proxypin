@@ -9,6 +9,15 @@ class AppLocalizationsZh extends AppLocalizations {
   AppLocalizationsZh([String locale = 'zh']) : super(locale);
 
   @override
+  String get breakpoint => '断点';
+
+  @override
+  String get breakpointRule => '断点规则';
+
+  @override
+  String get name => '名称';
+
+  @override
   String get requests => '抓包';
 
   @override
@@ -57,7 +66,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get proxySetting => '代理设置';
 
   @override
-  String get systemProxy => '设置为系统代理';
+  String get setAs => '设置为';
+
+  @override
+  String get systemProxy => '系统代理';
 
   @override
   String get enabledHTTP2 => '启用HTTP2';
@@ -512,9 +524,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get deleteFavoriteSuccess => '已删除收藏';
-
-  @override
-  String get name => '名称';
 
   @override
   String get historyRecord => '历史记录';
@@ -1061,6 +1070,15 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   AppLocalizationsZhHant() : super('zh_Hant');
 
   @override
+  String get breakpoint => '斷點';
+
+  @override
+  String get breakpointRule => '斷點規則';
+
+  @override
+  String get name => '名稱';
+
+  @override
   String get requests => '抓包';
 
   @override
@@ -1109,7 +1127,10 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get proxySetting => '代理設定';
 
   @override
-  String get systemProxy => '設定為系統代理';
+  String get setAs => '設定為';
+
+  @override
+  String get systemProxy => '系統代理';
 
   @override
   String get enabledHTTP2 => '啟用HTTP2';
@@ -1564,9 +1585,6 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get deleteFavoriteSuccess => '已刪除收藏';
-
-  @override
-  String get name => '名稱';
 
   @override
   String get historyRecord => '歷史記錄';

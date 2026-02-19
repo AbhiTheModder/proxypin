@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2023 Hongen Wang
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,16 +24,19 @@ import 'package:proxypin/l10n/app_localizations.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:proxypin/network/bin/server.dart';
 import 'package:proxypin/network/components/manager/request_crypto_manager.dart';
+import 'package:proxypin/network/components/manager/request_breakpoint_manager.dart';
 import 'package:proxypin/network/components/manager/request_map_manager.dart';
 import 'package:proxypin/network/components/manager/request_rewrite_manager.dart';
 import 'package:proxypin/network/components/manager/rewrite_rule.dart';
 import 'package:proxypin/network/components/manager/script_manager.dart';
 import 'package:proxypin/network/http/http.dart';
 import 'package:proxypin/network/util/logger.dart';
+import 'package:proxypin/network/components/request_breakpoint.dart';
 import 'package:proxypin/ui/component/device.dart';
 import 'package:proxypin/ui/component/utils.dart';
 import 'package:proxypin/ui/content/body.dart';
 import 'package:proxypin/ui/content/panel.dart';
+import 'package:proxypin/ui/desktop/debug/breakpoint_executor.dart';
 import 'package:proxypin/ui/desktop/request/request_editor.dart';
 import 'package:proxypin/ui/desktop/setting/request_rewrite.dart';
 import 'package:proxypin/ui/desktop/setting/script.dart';
@@ -42,6 +45,7 @@ import 'package:proxypin/utils/platform.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:window_manager/window_manager.dart';
 
+import '../desktop/setting/request_breakpoint.dart';
 import '../desktop/setting/request_crypto.dart';
 import '../desktop/setting/request_map.dart';
 import '../toolbox/cert_hash.dart';
@@ -107,6 +111,11 @@ Widget multiWindow(int windowId, Map<dynamic, dynamic> argument) {
     return RequestMapPage(windowId: windowId);
   }
 
+  // 请求拦截
+  if (argument['name'] == 'RequestBreakpointPage') {
+    return RequestBreakpointPage(windowId: windowId);
+  }
+
   if (argument['name'] == 'QrCodePage') {
     return QrCodePage(windowId: windowId);
   }
@@ -137,6 +146,16 @@ Widget multiWindow(int windowId, Map<dynamic, dynamic> argument) {
 
   if (argument['name'] == 'WebSocketRequestPage') {
     return WebSocketRequestPage(windowId: windowId);
+  }
+
+  if (argument['name'] == 'BreakpointExecutor') {
+    return BreakpointExecutor(
+      windowId: windowId,
+      request: HttpRequest.fromJson(argument['request']),
+      response: argument['response'] == null ? null : HttpResponse.fromJson(argument['response']),
+      isResponse: argument['type'] == 'response',
+      requestId: argument['requestId'],
+    );
   }
 
   return const SizedBox();
@@ -233,7 +252,7 @@ void registerMethodHandler() {
   }
   _registerHandler = true;
   DesktopMultiWindow.setMethodHandler((call, fromWindowId) async {
-    logger.d('${call.method} $fromWindowId ${call.arguments}');
+    logger.d('${call.method} $fromWindowId');
 
     if (call.method == 'getProxyInfo') {
       return ProxyServer.current?.isRunning == true ? {'host': '127.0.0.1', 'port': ProxyServer.current!.port} : null;
@@ -260,6 +279,13 @@ void registerMethodHandler() {
     if (call.method == 'refreshRequestCrypto') {
       await RequestCryptoManager.instance.then((value) {
         return value.reloadConfig();
+      });
+      return 'done';
+    }
+
+    if (call.method == 'refreshRequestBreakpoint') {
+      await RequestBreakpointManager.instance.then((value) {
+        return value.load();
       });
       return 'done';
     }
@@ -293,6 +319,19 @@ void registerMethodHandler() {
 
     if (call.method == 'deviceId') {
       return await DeviceUtils.desktopDeviceId();
+    }
+
+    if (call.method == 'resumeRequest') {
+      var request = HttpRequest.fromJson(jsonDecode(jsonEncode(call.arguments['request'])));
+      RequestBreakpointInterceptor.instance.resumeRequest(call.arguments['requestId'], request);
+      return 'done';
+    }
+
+    if (call.method == 'resumeResponse') {
+      var response = HttpResponse.fromJson(jsonDecode(jsonEncode(call.arguments['response'])));
+      response.requestId = call.arguments['requestId'];
+      RequestBreakpointInterceptor.instance.resumeResponse(call.arguments['requestId'], response);
+      return 'done';
     }
 
     return 'done';
@@ -335,3 +374,4 @@ Future<void> openScriptConsoleWindow() async {
     ..center();
   window.show();
 }
+

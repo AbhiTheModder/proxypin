@@ -1,4 +1,6 @@
 {
+  "breakpoint": "斷點",
+  "breakpointRule": "斷點規則",
   "requests": "抓包",
   "favorites": "收藏",
   "history": "歷史",
@@ -15,7 +17,8 @@
   "username": "使用者名稱",
   "password": "密碼",
   "proxySetting": "代理設定",
-  "systemProxy": "設定為系統代理",
+  "setAs": "設定為",
+  "systemProxy": "系統代理",
   "enabledHTTP2": "啟用HTTP2",
   "serverNotStart": "未開啟抓包",
   "download": "下載",
